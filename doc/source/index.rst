@@ -11,10 +11,25 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-.. automodule::
-   bequestlib.model
-   :members:
+Classes
+==========
 
+Person
+------------
+
+..  automodule::
+    bequestlib
+
+..  autoclass::
+    bequestlib.person.Person
+    :members:
+
+..  automodule::
+    bequestlib.person
+    :members:
+
+..  automodule::
+    main
 Indices and tables
 ==================
 
