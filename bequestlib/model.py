@@ -8,7 +8,7 @@ p = [0.35, 0.45, 0.1, 0.06, 0.03, 0.01]
 Es = 1
 nu = 0.3
 gamma = 0.4
-g = m.pow(1.03, 25)
+g = m.pow(1.02, 25)
 
 # starting division of bequests
 B_0 = 100 * np.ones(n)
