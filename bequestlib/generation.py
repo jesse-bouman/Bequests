@@ -203,6 +203,7 @@ class Generation:
         Make a generation of couples with children, create a new generation of
         adult couples. The current generation bequeaths wealth by a rule
         *bequest_rule*; singles match by a tradition *marital_tradition*.
+
         :param bequest_rule: function by which families bequeath wealth
         :type bequest_rule: ``callable[list, float]``
         :param marital_tradition: function by which singles match
