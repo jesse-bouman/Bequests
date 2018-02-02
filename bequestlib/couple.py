@@ -32,6 +32,10 @@ class Couple:
         self.b = None
         self.optimize_utility()
         self.id = c_id
+        self.decile = None
+
+    def set_decile(self, decile):
+        self.decile = decile
 
     def get_children(self, boys, girls):
         """
@@ -100,3 +104,18 @@ class Couple:
             new_adult.add_inheritance(inheritance)
             new_adults.append(new_adult)
         return new_adults
+
+    def to_array(self):
+        """
+        Provide an array that represents the most important information
+        of the couple object. Contains:
+
+        * 0 : couple id
+        * 1 : inherited wealth
+        * 2 : total acquired wealth
+        * 3 : time spent working
+
+        :return: list of important couple stats
+        :rtype: list
+        """
+        return [self.id, self.inh_wealth, self.w, self.e]

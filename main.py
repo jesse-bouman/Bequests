@@ -1,16 +1,19 @@
-from bequestlib.person import Person
+import os
+
 from bequestlib.couple import Couple
 from bequestlib.generation import Generation
-from bequestlib.metrics import lorentz_curve, gini
-from bequestlib.society_rules import (oldest_gets_all,
-                                      best_partner_is_richest_partner)
-import numpy as np
+from bequestlib.globals import OUTFOLDER
+from bequestlib.metrics import lorentz_curve, gini, mobility_matrix
+from bequestlib.person import Person
+from bequestlib.society_rules import (all_children_equal,
+                                      love_is_blind)
+from bequestlib.output_preparation import plot_lorentz_curve, plot_mobility_matrix
 import matplotlib.pyplot as plt
-
+import numpy as np
 
 def init_generation():
     # set up a fully egalitarian starting generation
-    n = 1000
+    n = 3000
     couples = int(n / 2.)
     couples_list = []
     for i in range(couples):
@@ -28,25 +31,26 @@ def init_generation():
 
 
 def main():
+    if not os.path.exists(OUTFOLDER):
+        os.mkdir(OUTFOLDER)
+    os.chdir(OUTFOLDER)
+
     adult_gen = init_generation()
 
     for t in range(100):
         adult_gen.distribute_children()
-        next_gen = adult_gen.produce_new_generation(bequest_rule=oldest_gets_all,
-                                                    marital_tradition=best_partner_is_richest_partner)
+        next_gen = adult_gen.produce_new_generation(bequest_rule=all_children_equal,
+                                                    marital_tradition=love_is_blind)
+        prev_gen = adult_gen
         adult_gen = next_gen
         x, y = lorentz_curve(adult_gen)
         gin = gini(x, y)
-        print(gin)
 
-    X = np.linspace(0, 1, len(y))
-    plt.xlabel("perc of pop")
-    plt.ylabel('perc of wealth')
-    plt.plot(X, y, X, X)
-    axes = plt.gca()
-    axes.set_ylim([0, 1])
+    plot_mobility_matrix(mobility_matrix(adult_gen, prev_gen))
+    plot_lorentz_curve(y)
+
+
     plt.show()
-
 
 if __name__ == '__main__':
     main()

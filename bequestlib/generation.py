@@ -24,8 +24,23 @@ class Generation:
         self.n = len(couples)
         self.id = g_id
         self.preg = self.population_register()
+        self.creg = None
         self.gini = None
         self.x = self.y = None
+
+    def __getitem__(self, item):
+        """
+        Getter function that makes a generation dict-like get
+        a couple by its couple id
+
+        :param item: couple id
+        :type item: int
+        :return: couple corresponding to couple id
+        :rtype: Couple
+        """
+        if self.creg is None:
+            self.creg = self.couple_register()
+        return self.creg[item]
 
     def adult_population(self):
         """
@@ -40,6 +55,60 @@ class Generation:
             men.append(couple.hb)
             women.append(couple.wf)
         return men, women
+
+    def population_register(self):
+        """
+        produces a population register, a dictionary that links a person to
+        its id number as key.
+
+        :return: ``dict`` of ``int``: <Person>
+        """
+        reg = {}
+        for couple in self.cs:
+            for person in [couple.hb, couple.wf]:
+                if person.id not in reg.keys() and person.id is not None:
+                    reg[person.id] = person
+                elif person.id is None:
+                    raise Exception("""Cannot make population register with
+                                       unregistered persons""")
+                else:
+                    raise Exception("""multiple persons in generation with 
+                                       same id""")
+        return reg
+
+    def couple_register(self):
+        """
+        Creates a couple register: a dictionary of all couple ids to
+        their respective couples.
+
+        :return: couple dict
+        :rtype: dict of str: <Couple>
+        """
+        couple_reg = {}
+        for couple in self.cs:
+            couple_reg[couple.id] = couple
+        return couple_reg
+
+    def to_array(self):
+        """
+        Turn the couple population into a single numpy array of
+        important stats. Contains (in this order)
+
+        * 0 : couple id
+        * 1 : inherited wealth
+        * 2 : total acquired wealth
+        * 3 : time spent working
+
+        :return: array of couple stats
+        :rtype: numpy.array
+        """
+        array = np.zeros([self.n, 4])
+        i = 0
+        for couple in self.cs:
+            array[i, :] = couple.to_array()
+            i = i + 1
+        return array
+
 
     def distribute_children(self):
         """
@@ -70,26 +139,6 @@ class Generation:
             boys = sum(children)
             girls = len(children) - boys
             self.cs[i].get_children(boys, girls)
-
-    def population_register(self):
-        """
-        produces a population register, a dictionary that links a person to
-        its id number as key.
-
-        :return: ``dict`` of ``int``: <Person>
-        """
-        reg = {}
-        for couple in self.cs:
-            for person in [couple.hb, couple.wf]:
-                if person.id not in reg.keys() and person.id is not None:
-                    reg[person.id] = person
-                elif person.id is None:
-                    raise Exception("""Cannot make population register with
-                                       unregistered persons""")
-                else:
-                    raise Exception("""multiple persons in generation with 
-                                       same id""")
-        return reg
 
     def produce_next_gen_bachelors(self, bequest_rule):
         """
@@ -165,8 +214,36 @@ class Generation:
         new_gen = self.match_bachelors(bach_m, bach_f, marital_tradition)
         return new_gen
 
+    def assign_deciles(self, measure='w'):
+        """
+        Measure deciles in the population according to measure *measure*,
+        and assign them to each constituent couple.
+
+        :param measure: measure to sort couples by. Default is 'w', total wealth
+        :type measure: str
+        """
+        measure_dict = {'inh_w': 1, 'w': 2, 'e': 3}
+        column = measure_dict[measure]
+        decile_edges = np.zeros(10)
+
+        stats_array = self.to_array()
+        for i in range(10):
+            decile = np.percentile(stats_array[:, column], 10*(i+1))
+            decile_edges[i] = decile
+        for couple in self.cs:
+            decile = sum(decile_edges < couple.w) + 1
+            couple.set_decile(decile)
 
 def _dict_to_statslist(bach_dict):
+    """
+    Turn the dictionary of bachelor(ette)s into a list of important
+    stats.
+
+    :param bach_dict: dict of bachelors: key: id, value: Person
+    :type bach_dict: dict of str: <Person>
+    :return: list of all bachelor stats
+    :rtype: numpy.array
+    """
     m = len(bach_dict.itervalues().next().to_array())
     bachelor_stats = np.zeros((len(bach_dict), m))
     i = 0

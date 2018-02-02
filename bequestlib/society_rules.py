@@ -1,5 +1,7 @@
+import numpy as np
 
-def bequestrule(children, b):
+
+def all_children_equal(children, b):
     return [b/len(children)]*len(children)
 
 
