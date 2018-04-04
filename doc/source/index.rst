@@ -3,10 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Bequest Simulator's documentation!
+Bequest Simulator: documentation
 =============================================
 
-Contents:
 
 .. toctree::
    :maxdepth: 2
@@ -18,18 +17,48 @@ Person
 ------------
 
 ..  automodule::
-    bequestlib
-
-..  autoclass::
-    bequestlib.person.Person
-    :members:
-
-..  automodule::
     bequestlib.person
     :members:
 
-..  automodule::
-    main
+Couple
+------------
+
+.. automodule::
+   bequestlib.couple
+   :members:
+
+Generation
+--------------
+
+.. automodule::
+   bequestlib.generation
+   :members:
+
+Helper Function Modules
+========================
+
+Societal Rules
+---------------
+
+.. automodule::
+   bequestlib.society_rules
+   :members:
+
+Generational Metrics
+---------------------
+
+.. automodule::
+   bequestlib.metrics
+   :members:
+
+Output functions
+-----------------
+
+.. automodule::
+   bequestlib.output_preparation
+   :members:
+
+
 Indices and tables
 ==================
 

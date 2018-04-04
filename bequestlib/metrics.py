@@ -1,6 +1,7 @@
 import numpy as np
 
 
+
 def lorentz_curve(gen):
     """
     Determine the lorentz curve for total wealth inequality of generation *gen*

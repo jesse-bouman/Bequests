@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from bequestlib.globals import TIMESTAMP
+from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 def plot_lorentz_curve(y):
     """
@@ -38,3 +39,39 @@ def plot_mobility_matrix(mm):
               cellColours=plt.cm.BuPu(cmm), rowLabels=rows,
               colLabels=rows)
     plt.savefig("mobility_matrix"+TIMESTAMP+'.png')
+
+
+def plot_convergence_lorentz_curve(*args):
+    """
+    Make an animated GIF file showing the convergence of subsequent
+    Lorentz curves.
+
+    :param args: x, y pairs of Lorentz curves to be outputted
+    :type args: tuple of tuple of array-like
+    """
+    print(args)
+    fig, ax = plt.subplots()
+    fig.set_tight_layout(True)
+
+    # Query the figure's on-screen size and DPI. Note that when saving the figure to
+    # a file, we need to provide a DPI for that separately.
+    print('fig size: {0} DPI, size in inches {1}'.format(
+        fig.get_dpi(), fig.get_size_inches()))
+
+    x = args[0][0]
+
+    def update(i):
+        label = 'timestep {0}'.format(i)
+        print(label)
+        ax.clear()
+        y = args[i][1]
+        ax.set_xlabel(label)
+        ax.plot(x, x)
+        ax.plot(x, y)
+
+    # FuncAnimation will call the 'update' function for each frame; here
+    # animating over 10 frames, with an interval of 200ms between frames.
+    plt.rcParams['animation.ffmpeg_path'] = 'C:\\Users\\Jesse Bouman\\.ffmpg\\ffmpeg-20180404-2accdd3-win64-static\\bin\\ffmpeg.exe'
+    ffwriter = FFMpegWriter()
+    anim = FuncAnimation(fig, update, frames=len(args), interval=200)
+    anim.save("convergence_Lorentz_" + TIMESTAMP + ".mp4", dpi=80, writer=ffwriter)
