@@ -68,7 +68,7 @@ def main():
     tmp2 = [(adult_gen, d, p) for adult_gen, d, p in eq_gen]
     tmp3 = [(adult_gen, d, p) for adult_gen, d, p in mos_gen]
     res = (lorentz_curve(adult_gen) for adult_gen, d, p in tmp3)
-    plot_convergence_lorentz_curve(*res)
+    #plot_convergence_lorentz_curve(*res)
     res2 = [gini(*lorentz_curve(adult_gen)) for adult_gen, d, p in tmp]
     ds = [d for adult_gen, d, p in tmp]
     ps = [p for adult_gen, d, p in tmp]

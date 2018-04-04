@@ -1,4 +1,4 @@
-from globals import NU, GAMMA, E_S, G
+from bequestlib.globals import NU, GAMMA, E_S, G
 import numpy as np
 from bequestlib.person import Person
 

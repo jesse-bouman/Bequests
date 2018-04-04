@@ -1,5 +1,5 @@
 import numpy as np
-from ConfigParser import ConfigParser
+from configparser import ConfigParser
 import datetime
 import os
 
