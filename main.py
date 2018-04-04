@@ -77,9 +77,11 @@ def main():
     x1, y1 = lorentz_curve(tmp[-1][0])
     x2, y2 = lorentz_curve(tmp2[-1][0])
     x3, y3 = lorentz_curve(tmp3[-1][0])
-    plt.plot(x1, y1)
-    plt.plot(x2, y2)
-    plt.plot(x3, y3)
+    plt.plot(x1, y1, label='equal bequest, class society')
+    plt.plot(x2, y2, label='equal bequest, free marriage')
+    plt.plot(x3, y3, label='male primogeniture, class society')
+    plt.legend()
+    plt.savefig('compare_rules.png')
     plt.show()
     """
     plt.clf()
@@ -95,6 +97,7 @@ def main():
     plt.ylabel("Gini coefficient")
     plt.savefig("gini_" + TIMESTAMP + ".png")
     """
+
 
 if __name__ == '__main__':
     main()

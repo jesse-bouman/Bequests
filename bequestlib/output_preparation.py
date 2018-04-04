@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from bequestlib.globals import TIMESTAMP
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 def plot_lorentz_curve(y):
     """
@@ -71,6 +71,7 @@ def plot_convergence_lorentz_curve(*args):
 
     # FuncAnimation will call the 'update' function for each frame; here
     # animating over 10 frames, with an interval of 200ms between frames.
+    plt.rcParams['animation.ffmpeg_path'] = 'C:\\Users\\Jesse Bouman\\.ffmpg\\ffmpeg-20180404-2accdd3-win64-static\\bin\\ffmpeg.exe'
+    ffwriter = FFMpegWriter()
     anim = FuncAnimation(fig, update, frames=len(args), interval=200)
-    anim.save("convergence_Lorentz_"+TIMESTAMP+".gif", dpi=80, writer='imagemagick')
-
+    anim.save("convergence_Lorentz_" + TIMESTAMP + ".mp4", dpi=80, writer=ffwriter)
