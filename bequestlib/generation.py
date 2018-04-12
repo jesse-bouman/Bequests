@@ -165,6 +165,34 @@ class Generation:
                     bachelorettes[new_adult.id] = new_adult
         return bachelors, bachelorettes
 
+    def redistribute_taxes(self, bachelors, bachelorettes, tax_rate):
+        s = tax_rate
+        total_tax = 0
+        for id, person in bachelors.items():
+            tax = s * person.inh
+            person.inh-=tax
+            total_tax+=tax
+        for id, person in bachelorettes.items():
+            tax = s * person.inh
+            person.inh-=tax
+            total_tax+=tax
+        lump_sum = total_tax/(len(bachelors)+len(bachelorettes))
+
+        for id, person in bachelors.items():
+            person.inh += lump_sum
+        for id, person in bachelorettes.items():
+            person.inh += lump_sum
+        return bachelors, bachelorettes
+
+    def time_spent_working(self):
+        c = self.cs
+        e = 0
+        for couple in c:
+            e_i = couple.e
+            e+=e_i
+        return e
+
+
     def match_bachelors(self, bachelors, bachelorettes, marital_tradition):
         """
         Match the single men in *bachelors* and the single women in
@@ -198,7 +226,7 @@ class Generation:
             new_couples.append(new_couple)
         return Generation(self.id + 1, new_couples)
 
-    def produce_new_generation(self, bequest_rule, marital_tradition):
+    def produce_new_generation(self, bequest_rule, marital_tradition, tax_rate):
         """
         Make a generation of couples with children, create a new generation of
         adult couples. The current generation bequeaths wealth by a rule
@@ -212,6 +240,7 @@ class Generation:
         :rtype: Generation
         """
         bach_m, bach_f = self.produce_next_gen_bachelors(bequest_rule)
+        bach_m, bach_f = self.redistribute_taxes(bach_m, bach_f, tax_rate)
         new_gen = self.match_bachelors(bach_m, bach_f, marital_tradition)
         return new_gen
 
