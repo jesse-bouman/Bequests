@@ -274,7 +274,7 @@ def _dict_to_statslist(bach_dict):
     :return: list of all bachelor stats
     :rtype: numpy.array
     """
-    m = len(bach_dict.itervalues().next().to_array())
+    m = len(next(iter(bach_dict.values())).to_array())
     bachelor_stats = np.zeros((len(bach_dict), m))
     i = 0
     for person in bach_dict.values():

@@ -1,0 +1,68 @@
+% book example for classicthesis.sty
+
+\documentclass[twoside,chapterprefix,11pt, a4paper,footinclude=true,headinclude=true,cleardoublepage=empty,BCOR=5mm]{scrbook}
+
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+\usepackage[linedheaders,pdfspacing,dottedtoc]{classicthesis}
+\usepackage[left=1.5in,right=1.2in,top=1in,bottom=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{etoolbox}
+\usepackage{amsthm}
+\usepackage{acronym}
+\usepackage{gensymb}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{physics}
+%\RedeclareSectionCommand[beforeskip=30pt,afterskip=20pt]{chapter}
+%\renewcommand*\chapterheadmidvskip{\par\nobreak\vspace{10pt}}
+
+
+\newcommand{\tussenstap}{\textregistered{}}
+\newcommand{\textreg}{\textsuperscript{\tussenstap{}}}
+
+
+
+\makeatletter
+\patchcmd{\scr@startsection}{\if@openright\cleardoublepage\else\clearpage\fi}{}{}{}
+\makeatother
+
+\title{Thesis Title}
+\author{John Doe}
+
+\begin{document}
+\frenchspacing
+\raggedbottom
+\selectlanguage{english} % american ngerman
+%\renewcommand*{\bibname}{new name}
+%\setbibpreamble{}
+\pagenumbering{roman}
+\pagestyle{plain}
+
+%\maketitle
+\include{FrontBackMatter/title}
+\include{FrontBackMatter/Copyright}
+\include{FrontBackMatter/abstract}
+\include{FrontBackMatter/acknowledgements}
+\include{FrontBackMatter/contents}
+\pagenumbering{arabic}
+%\part{Preliminaries}
+\pagestyle{scrheadings}
+\chapter{Preface}
+\input{Intro/preface}
+
+\chapter{Theory}
+\input{Theory/model}
+
+\chapter{Initial results}
+\input{Results/initial_results}
+\appendix
+
+\bibliographystyle{siam}
+\bibliography{Bibliography/bibliography}
+\end{document}

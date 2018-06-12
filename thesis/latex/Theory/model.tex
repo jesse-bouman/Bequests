@@ -1,0 +1,194 @@
+\section{The Model}
+
+\subsection{Families}
+We imagine our economy is made up out of a constant number $n$ families, a pair of adults with a positively finite number of children. Time is considered into discrete periods: In every period $t'$, there is exactly one generation of adults, and one generation of children. In $t'+1$, the children from generation $t'$ become the adults. Every person finds a partner to start a new family and procreate. Every adult from generation $t'$ has died by $t=t'+1$. This means that every generation can be denoted uniquely by the period that they are adults. \\
+The amount of children per family is determined by chance. Let us define the fraction of families having $k\geq 0$ children to be $p_k$. The maximum number of children any family can have, is $K$. Normalisation of probability must give $\sum_{k=0}^K p_k = 1$. In our model we discard the influence of population growth: the total number of families remains constant. This means that on average, every family produces exactly 2 children, or:
+\begin{equation}
+    \overline{k} = \sum_{k=0}^K k p_k = 2 \,.
+\end{equation}
+
+\subsection{Allocation Problem}
+Couples of adults are confronted with an allocation problem. They can enjoy utility in three ways: by consuming $C_t$, enjoying leisure $L_t$, or by passing wealth down to their children, the bequests $B_t$. The bequests are defined as the total amount of wealth available to offspring \emph{in period $t+1$}. If we assume an iso-elastic utility function, then the family's allocation problem comes down to maximising
+\begin{equation}
+    U(C_t,L_t,B_t) = \gamma \ln B_t + (1-\gamma) \ln C_t + \nu \ln L_t\,.
+    \label{eq:U}
+\end{equation}
+
+Families pay for these expenses with the total wealth $W_t$ they accrue in period $t$. This consists of the income out of labour, $E_t$, and the wealth inherited from their parents, $I_t$, so
+\begin{equation}
+    W_t = E_t + I_t\,.
+\end{equation}
+Expenses consist of consumption, and wealth saved for bequests. Imagine the economy shows a growth rate of $g$, then savings can be expected to receive a similar real interest rate. Any real unit saved in period $t$, therefore has a value $1+g$ in period $t+1$. This means that the cost of providing a bequest $B_t$ is $\frac{B_t}{1+g}$. Total expenditures cannot be greater than wealth, giving rise to the budget constraint
+\begin{equation}
+    C_t + \frac{B_t}{1+g} \leq E_t + I_t\,.
+\end{equation}
+
+Finally, the amount of leisure is determined by the time spent working. The fraction of available time spent to leisure, $L_t$, can therefore be written as a function of the labour income. Imagine that the maximum attainable labour income is $\overline{E}$, which corresponds to no leisure at all. Then leisure is given by:
+\begin{equation}
+    L_t = \frac{\overline{E} - E_t}{\overline{E}}\,.
+\end{equation}
+In conclusion, families face the following optimisation problem
+\begin{equation}
+    \max_{E_t,C_t,B_t} \gamma \ln B_t + (1-\gamma) \ln C_t + \nu \ln L_t
+\end{equation}
+subject to
+\begin{align}
+      C_t + \frac{B_t}{1+g} &\leq E_t + I_t \,,\\
+      B_t, C_t, E_t &>0 \,,\\
+      E_t & < \overline{E}\,.
+\end{align}
+
+We maximise the Lagrangian
+\begin{equation}
+    \mathcal{L} = \gamma \ln B_t + (1-\gamma)\ln C_t + \nu \ln \left[1-\frac{E_t}{\overline{E}} \right] + \lambda \left[I_t + E_t - C_t - \frac{B_t}{1+g}\right]\,.
+\end{equation}
+\begin{align}
+    \pdv{\mathcal{L}}{B_t} &= 0: &\gamma \frac{1}{B_t} + \lambda\left[-\frac{1}{1+g}\right] = 0\\
+    \label{eq:B}
+    && \lambda = (1+g) \gamma \frac{1}{B_t}\\
+    \pdv{\mathcal{L}}{C_t} &=0: & (1-\gamma)\frac{1}{C_t} - \lambda = 0\\
+    \label{eq:C}
+    && \lambda = (1-\gamma)\frac{1}{C_t}\\
+    \pdv{\mathcal{L}}{E_t} &=0 : &\nu \frac{-\frac{1}{\overline{E}}}{1-\frac{E_t}{\overline{E}}} + \lambda = 0\\
+    \label{eq:E}
+    && \lambda = - \frac{\nu}{E_t-\overline{E}}
+\end{align}
+Combination of (\ref{eq:B}) and (\ref{eq:C}) yields
+\begin{equation}
+    B_t = (1+g) \frac{\gamma}{1-\gamma} C_t\,,
+\end{equation}
+And if we invoke the budget constraint:
+\begin{align}
+    (1+g) \left[ E_t + I_t - C_t \right] &= (1+g) \frac{\gamma}{1-\gamma} C_t\\
+    C_t &= (1-\gamma) (E_t + I_t)\,. \label{eq:CE}
+\end{align}
+Similarly, we can use (\ref{eq:C}) and (\ref{eq:E}) to find
+\begin{equation}
+E_t - \overline{E} = -\frac{\nu}{1-\gamma}C_t\,.
+\end{equation}
+Substituting $C_t$ for our earlier result in (\ref{eq:CE}) yields
+\begin{align}
+E_t - \overline{E} &= -\frac{\nu}{1-\gamma}(1-\gamma) (E_t + I_t)\\
+E_t + \nu E_t &= \overline{E} - \nu I_t\\
+E_t &= \frac{\overline{E} - \nu I_t}{1 + \nu}\,.
+\label{eq:Et}
+\end{align}
+Being more wealthy from inheritance makes families opt to spend less time on working and enjoying more leisure. The result in (\ref{eq:Et}) shows unrealistic behaviour: very wealthy subjects ($\nu I_t > \overline{E}$) choose to "pay" for a negative time of work and enjoy a physically impossible time of leisure. We make agents respect the constraint $E_t\geq0$ by using the allocation
+\begin{equation}
+    E_t = \max \left\{ \frac{\overline{E} - \nu I_t}{1 + \nu} , 0 \right\}\,.
+\end{equation}
+The size of the received inheritance fully determines the time spent on labour, and therefore labour income $E_t$. From the total wealth, we immediately find the size of consumption and bequests:
+\begin{align}
+    C_t &= (1-\gamma)W_t\\
+    B_t &= (1+g)\gamma W_t \\
+    S_t &= W_t - C_t = \gamma W_t
+\end{align}
+
+\subsubsection{Alternative utility specification}
+\label{sss:alt-utility}
+The utility function (\ref{eq:U}) attributes utility to the act of bequeathing. One might say this is not realistic in terms of parents' incentives: it is the goal (children receiving wealth) that drives utility, not the act itself. For this reason we might explore:
+\begin{itemize}
+    \item Parents receiving utility from the total amount of money received by their children, $(1+r)B_t$
+    \item Parents receiving utility from the wealth position of their individual children, $(1+r)\frac{B_t}{k}$ 
+\end{itemize}
+However, it can be easily seen that any multiplicative factor (be it a tax, interest, division over children) has no influence on decision making in the logarithmic utility function:
+\begin{equation}
+    U(C_t,L_t,a B_t) = U(C_t,L_t,B_t) + \gamma \ln a\,.
+\end{equation}
+The constant multiplicative factor is differentiated away and has no influence on our constituents' decision making. In the logarithmic (allowance free, c.f. infra) specification, the utility function (\ref{eq:U}) is representative of all the above situations. 
+
+\subsection{Linking generations}
+In the previous section, we found that inheritance fully determines the behaviour of the family. In order to link the bequests of generation $t-1$ to the inheritance of generation $t$, we need to consider two processes: the distribution of bequest among children, and marriage patterns.
+
+\subsubsection{Distribution of bequests}
+The total inheritance consists of what both the husband and wife have received from their parents, or $I_t = i^M_t + i^F_t$. The individual inheritances of generation $t$ are decided by the parent generation $t-1$. There are many ways of distributing the bequests, and in theory every family could decide for their own rule. For the sake of simplicity, we will assume that every family follows the same rule. Possible distributions of bequests are:
+\begin{itemize}
+\item An equal distribution between all children. In a family with $k$ children, this gives: $i_t = \frac{1}{k}B_{t-1}$
+    \item Male-preference primogeniture. The eldest male child receives everything. In case there are no male heirs, the eldest female child receives all bequests
+\end{itemize}
+
+
+
+
+\subsubsection{Marriage patterns}
+\begin{itemize}
+\item{\emph{Class society}: men and women choose partners in order to maximise family inheritance. This means that the man (woman) with the highest inheritance will be able to marry the woman (man) with the highest inheritance. This process will continue down to the second richest, third richest ...
+
+Let $\mathbf{i^M_t}$ be the vector containing all male individual inheritances (and likewise $\mathbf{i^F_t}$ for female inheritances), then the new family inheritance vector $\mathbf{I_t}$ will be given by
+\begin{equation}
+    \mathbf{I_t} = \mathbf{i^M_t}^\downarrow{} + \mathbf{i^F_t}^\downarrow{} \,.
+\end{equation}
+Where $\mathbf{X}^\downarrow{}$ denotes an ordered vector, from high to low.}
+\item{\emph{Egalitarian marriage}: The other extreme is a society in which there is no correlation between matchmaking and individual inheritance. In a model, this means that men and women are coupled at random, or mathematically:
+\begin{equation}
+    \mathbf{I_t} = \mathbf{i_t^M} + P\mathbf{i_t^F}\,.
+\end{equation}}
+With $P$ a randomly chosen permutation matrix
+\end{itemize}
+
+
+
+\subsubsection{Incorporating tax}
+Imagine that the government decides to impose a tax on inheritance. Upon changing generations, the government taxes a fraction $\tau$ of the funds available for bequest. Let us denote by $S_t$ the savings made by generation $t$ in order to serve as bequests. Then the bequests become $B_t = (1+g)(1-\tau)S_t$, the complement, the tax revenue of a family becomes $T_t = \tau (1+g)S_t$.
+
+This doesn't close to economic equilibrium. Taxation is spent elsewhere in the economy. We have to make assumptions on the incorporation of this budgetary policy. We make the following two assumptions:
+\begin{itemize}
+    \item Balanced budget: every generation, the government spends exactly the money it receives.
+    \item Full equal redistribution: all government income is redistributed equally among all constituents.
+\end{itemize}
+Practically this means that every family receives an additional income we denote by $\mu_t$, equal to the $n$th part of total taxation, or
+\begin{equation}
+    \mu_t = \frac{\sum\limits_{i=1}^n T_t^i}{n}
+\end{equation}
+In the simple base model, families the same utility function, but the budget constraint becomes:
+\begin{align}
+    C_t + S_t &\leq E_t + I_t + \mu_t \\
+    C_t + \frac{B_t}{(1+\gamma)(1-\tau)} &\leq E_t + I_t + \mu_t
+\end{align}
+
+The derivation is fully analogously to the situation without taxation, under substitution of $(1+g)$ by $(1+g)(1-\tau)$, and $I_t$ by $I_t' = I_t + \mu_t$. We find the optimal allocations:
+\begin{align}
+    E_t &= \max \left\{ \frac{\overline{E}-\nu (I_t+ \mu_t)}{1+\nu},0\right\}\\
+    W_t &= E_t + I_t + \mu_t\\
+    C_t &= (1-\gamma)W_t\\
+    S_t &= \gamma W_t \\
+    B_t &= (1-\tau)(1+g)\gamma W_t\\
+    T_t &= \tau (1+g)\gamma W_t
+\end{align}
+Interestingly, given a set of $I_t, \mu_t$, the tax rate on inheritance has no influence on the family's decision making. In the basic model, taxation only influences the family's work and consumption decisions through its influence on inheritance and allowances. This also leads to the rather extreme result that families keep spending an equal amount of their income on bequeathing their wealth, even if the full amount is taxed and no money reaches their children ($\tau = 0$)
+
+\subsubsection{Alternative specification of utility}
+In section \ref{sss:alt-utility} we derived that in a model without allowances, the utility specification driven by size of bequests $B_t$ is equivalent to a utility driven by the wealth position of the children.
+
+In the case of an allowance $\mu_t$, this is no longer the case. Indeed, image couples receive utility from the wealth position of their children before marriage. Holding on to the logarithmic specification, this leads to:
+
+\begin{equation}
+    U(C_t,L_t,B_t) = \gamma \ln \mathrm{E}[I_{t+1} + \mu_{t+1}] + (1-\gamma) \ln C_t + \nu \ln L_t
+    \label{eq:U}
+\end{equation}
+
+The question is what parents expect for these two values. For inheritance, parents can easily form expectations. One finds:
+
+\begin{equation}
+    \mathrm{E}[I_{t+1}] = \mathrm{E}[(1-\tau)B_t]
+\end{equation}
+Assuming a constant tax rate, this is a fully certain value. In other words
+\begin{equation}
+    \mathrm{E}[I_{t+1}] = I_{t+1} = (1-\tau)B_t
+\end{equation}
+
+The case of $\mu_t$ is much less simpler. The future value of $\mu_t$ is determined by the collective decision of all families:
+\begin{align}
+    \mu_{t+1} &= \frac{\sum\limits_{i=1}^n T_{t+1}^i}{n} \\
+    \mu_{t+1} &= \frac{\sum\limits_{i=1}^n \tau B_t^i}{n}
+\end{align}
+
+The question is to what extend families can predict other families' decisions. We can make two interesting assumptions.
+
+\begin{itemize}
+    \item Rational expectations. Families can correctly assess all other families' decision making. This means that all families correctly assess the next generation's allowance as $\mu_t^*$
+    \item Constant expectations. Families expect the next generation's allowance to be the same as the current day's. In formula:
+    \begin{equation}
+        \mathrm{E}[\mu_{t+1}] = \mu_t
+    \end{equation}
+\end{itemize}

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from bequestlib.globals import TIMESTAMP
 from matplotlib.animation import FuncAnimation, FFMpegWriter
-
+from bequestlib.metrics import lorentz_curve
 def plot_lorentz_curve(y):
     """
 
@@ -75,3 +75,15 @@ def plot_convergence_lorentz_curve(*args):
     ffwriter = FFMpegWriter()
     anim = FuncAnimation(fig, update, frames=len(args), interval=200)
     anim.save("convergence_Lorentz_" + TIMESTAMP + ".mp4", dpi=80, writer=ffwriter)
+
+
+class ThesisPlotter:
+    def __init__(self, data):
+        self.data = data
+
+    def fig_lorentz_per_tax_rate(self):
+        plt.clf()
+        for tax_rate, data_gen in self.data.items():
+            plt.plot(*lorentz_curve(data_gen[-1]['generation']), label = 'tax rate {:.0f}%'.format(tax_rate*100))
+        plt.legend()
+        plt.show()
