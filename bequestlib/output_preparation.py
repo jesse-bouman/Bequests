@@ -3,6 +3,7 @@ import numpy as np
 from bequestlib.globals import TIMESTAMP
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 
+
 def plot_lorentz_curve(y):
     """
 
@@ -32,7 +33,7 @@ def plot_mobility_matrix(mm):
     axs.axis('tight')
     axs.axis('off')
     cmm = mm/np.max(mm)
-    rows = range(1,11)
+    rows = range(1, 11)
     tmm = (mm*100).tolist()
     tmm = [map("{:.2f}%".format, row) for row in tmm]
     axs.table(cellText=tmm, loc='center',
@@ -53,8 +54,8 @@ def plot_convergence_lorentz_curve(*args):
     fig, ax = plt.subplots()
     fig.set_tight_layout(True)
 
-    # Query the figure's on-screen size and DPI. Note that when saving the figure to
-    # a file, we need to provide a DPI for that separately.
+    # Query the figure's on-screen size and DPI. Note that when saving the
+    # figure to a file, we need to provide a DPI for that separately.
     print('fig size: {0} DPI, size in inches {1}'.format(
         fig.get_dpi(), fig.get_size_inches()))
 
@@ -71,7 +72,9 @@ def plot_convergence_lorentz_curve(*args):
 
     # FuncAnimation will call the 'update' function for each frame; here
     # animating over 10 frames, with an interval of 200ms between frames.
-    plt.rcParams['animation.ffmpeg_path'] = 'C:\\Users\\Jesse Bouman\\.ffmpg\\ffmpeg-20180404-2accdd3-win64-static\\bin\\ffmpeg.exe'
+    plt.rcParams['animation.ffmpeg_path'] = \
+        'C:\\Users\\Jesse Bouman\\.ffmpg\\ffmpeg-20180404-2accdd3-win64-static\\bin\\ffmpeg.exe'
     ffwriter = FFMpegWriter()
     anim = FuncAnimation(fig, update, frames=len(args), interval=200)
-    anim.save("convergence_Lorentz_" + TIMESTAMP + ".mp4", dpi=80, writer=ffwriter)
+    anim.save("convergence_Lorentz_" + TIMESTAMP + ".mp4",
+              dpi=80, writer=ffwriter)

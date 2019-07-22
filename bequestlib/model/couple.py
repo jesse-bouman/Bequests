@@ -1,6 +1,8 @@
 from bequestlib.globals import NU, GAMMA, E_S, G
 import numpy as np
-from bequestlib.person import Person
+from bequestlib.model.person import Person
+
+from bequestlib.random import get_random_state
 
 
 class Couple:
@@ -30,7 +32,6 @@ class Couple:
         self.w = None
         self.c = None
         self.b = None
-        self.optimize_utility()
         self.id = c_id
         self.decile = None
 
@@ -52,11 +53,12 @@ class Couple:
         :param girls: Number of daughters in family
         :type girls: ``int``
         """
-        child_vector = [True]*boys + [False]*girls
-        np.random.shuffle(child_vector)
+        child_vector = [True] * boys + [False] * girls
+        random = get_random_state()
+        random.shuffle(child_vector)
         self.children = child_vector
 
-    def optimize_utility(self):
+    def optimize_utility(self, mu_exp, tax_rate):
         """
         Let the couple, based on their total inherited wealth, make a utility
         optimizing decision on the amount of work, consumption and bequest they
@@ -72,10 +74,21 @@ class Couple:
 
         """
         i = self.inh_wealth
-        e = np.maximum((E_S - NU * i) / (1. + NU), 0)
+        k = len(self.children)
+        perceived_w = (mu_exp * k) / ((1 + G) * (1 - tax_rate))
+        e = np.maximum((E_S - NU * (i + perceived_w)) / (1. + NU), 0)
         w = e + i
-        c = (1 - GAMMA) * w
-        b = (1 + G) * GAMMA * w
+        c = (1 - GAMMA) * (e + i + perceived_w)
+        b = (1 + G) * GAMMA * (e + i + perceived_w) - (1 - GAMMA) / (1 - tax_rate) * mu_exp * k
+        if b < 0:
+            b = 0
+            e = (1 - GAMMA - NU * i) / (1 - GAMMA + NU)
+            c = (1 - GAMMA) / NU * (E_S - e)
+        assert not b < 0
+        assert not e < 0
+        assert not e > 1
+        assert not c < 0
+
         self.e = e
         self.w = w
         self.c = c

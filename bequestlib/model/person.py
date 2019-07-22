@@ -47,6 +47,11 @@ class Person:
         """
         return [self.id, int(self.g), self.pci, self.inh]
 
+    @classmethod
+    def data_size(cls):
+        example = cls(0, 0)
+        return len(example.to_array())
+
     def __str__(self):
         g_dict = {True: "Male", False: "Female"}
         string = """Person {}, {} \nParent couple id {} \nInherited {}
@@ -55,10 +60,3 @@ class Person:
 
     def __repr__(self):
         return self.__str__()
-
-
-
-
-
-
-

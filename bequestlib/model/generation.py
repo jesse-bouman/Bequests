@@ -1,6 +1,9 @@
+from bequestlib.random import get_random_state
+from bequestlib.model.couple import Couple
+from bequestlib.globals import P, G
+from bequestlib.model.person import Person
+from numpy.random import RandomState
 import numpy as np
-from bequestlib.couple import Couple
-from bequestlib.globals import P
 
 
 class Generation:
@@ -25,8 +28,6 @@ class Generation:
         self.id = g_id
         self.preg = self.population_register()
         self.creg = None
-        self.gini = None
-        self.x = self.y = None
 
     def __getitem__(self, item):
         """
@@ -72,7 +73,7 @@ class Generation:
                     raise Exception("""Cannot make population register with
                                        unregistered persons""")
                 else:
-                    raise Exception("""multiple persons in generation with 
+                    raise Exception("""multiple persons in generation with
                                        same id""")
         return reg
 
@@ -109,7 +110,6 @@ class Generation:
             i = i + 1
         return array
 
-
     def distribute_children(self):
         """
         distribute children randomly among all families in the generation, in a
@@ -122,18 +122,19 @@ class Generation:
         sets the respective number of children within each Couple object
         """
         all_new_children = [True] * self.n + [False] * self.n
-        np.random.shuffle(all_new_children)
+        random: RandomState = get_random_state()
+        random.shuffle(all_new_children)
         family_sizes = []
         i = 1
         j = 0
         for p in P:
             n_families_size_i = int(p * self.n)
             for fam in range(n_families_size_i):
-                children = all_new_children[j: j +i]
+                children = all_new_children[j: j + i]
                 j = j + i
                 family_sizes.append(children)
             i = i + 1
-        np.random.shuffle(family_sizes)
+        random.shuffle(family_sizes)
         for i in range(self.n):
             children = family_sizes[i]
             boys = sum(children)
@@ -170,28 +171,18 @@ class Generation:
         total_tax = 0
         for id, person in bachelors.items():
             tax = s * person.inh
-            person.inh-=tax
-            total_tax+=tax
+            person.inh -= tax
+            total_tax += tax
         for id, person in bachelorettes.items():
             tax = s * person.inh
-            person.inh-=tax
-            total_tax+=tax
-        lump_sum = total_tax/(len(bachelors)+len(bachelorettes))
-
+            person.inh -= tax
+            total_tax += tax
+        lump_sum = total_tax / (len(bachelors) + len(bachelorettes))
         for id, person in bachelors.items():
             person.inh += lump_sum
         for id, person in bachelorettes.items():
             person.inh += lump_sum
-        return bachelors, bachelorettes
-
-    def time_spent_working(self):
-        c = self.cs
-        e = 0
-        for couple in c:
-            e_i = couple.e
-            e+=e_i
-        return e
-
+        return bachelors, bachelorettes, lump_sum
 
     def match_bachelors(self, bachelors, bachelorettes, marital_tradition):
         """
@@ -240,8 +231,11 @@ class Generation:
         :rtype: Generation
         """
         bach_m, bach_f = self.produce_next_gen_bachelors(bequest_rule)
-        bach_m, bach_f = self.redistribute_taxes(bach_m, bach_f, tax_rate)
+        bach_m, bach_f, lump_sum = self.redistribute_taxes(bach_m, bach_f, tax_rate)
         new_gen = self.match_bachelors(bach_m, bach_f, marital_tradition)
+        new_gen.distribute_children()
+        for cp in new_gen.cs:
+            cp.optimize_utility(lump_sum, tax_rate)
         return new_gen
 
     def assign_deciles(self, measure='w'):
@@ -264,6 +258,7 @@ class Generation:
             decile = sum(decile_edges < couple.w) + 1
             couple.set_decile(decile)
 
+
 def _dict_to_statslist(bach_dict):
     """
     Turn the dictionary of bachelor(ette)s into a list of important
@@ -274,7 +269,7 @@ def _dict_to_statslist(bach_dict):
     :return: list of all bachelor stats
     :rtype: numpy.array
     """
-    m = len(bach_dict.itervalues().next().to_array())
+    m = Person.data_size()
     bachelor_stats = np.zeros((len(bach_dict), m))
     i = 0
     for person in bach_dict.values():

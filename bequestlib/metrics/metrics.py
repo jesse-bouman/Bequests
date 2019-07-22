@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 def lorentz_curve(gen):
     """
     Determine the lorentz curve for total wealth inequality of generation *gen*
@@ -62,7 +61,7 @@ def mobility_matrix(gen, prev_gen, measure='w'):
     gen.assign_deciles(measure=measure)
     prev_gen.assign_deciles(measure=measure)
     mm = np.zeros([10, 10])
-    #for each couple in the current generation:
+    # for each couple in the current generation:
     for couple in gen.cs:
         # find the couple decile
         c_dec = couple.decile - 1
@@ -78,5 +77,5 @@ def mobility_matrix(gen, prev_gen, measure='w'):
         # add
         mm[p_hb_dec, c_dec] = mm[p_hb_dec, c_dec] + 1
         mm[p_wf_dec, c_dec] = mm[p_wf_dec, c_dec] + 1
-    mm  = mm / (gen.n * 2)
+    mm = mm / (gen.n * 2)
     return mm
