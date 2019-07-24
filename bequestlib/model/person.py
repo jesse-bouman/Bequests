@@ -1,8 +1,11 @@
+from typing import List
+
+
 class Person:
     """
     Class defining a gendered person with the ability to inherit wealth
     """
-    def __init__(self, gender, parent_couple_id):
+    def __init__(self, gender: bool, parent_couple_id: int):
         """
         Class constructor, creating a new person with gender *gender*, and who
         is born in the family with couple id *parent_couple_id*. Upon
@@ -13,12 +16,12 @@ class Person:
         :param parent_couple_id: identity number of the parent couple
         :type parent_couple_id: ``int``
         """
-        self.g = gender
-        self.inh = 0
-        self.id = None
-        self.pci = parent_couple_id
+        self.gender: bool = gender
+        self.inh: float = 0
+        self.id: int = None
+        self.pci: int = parent_couple_id
 
-    def add_inheritance(self, inheritance):
+    def add_inheritance(self, inheritance: float):
         """
         Increases the total inherited wealth of the person by the amount
         *inheritance*
@@ -28,7 +31,7 @@ class Person:
         """
         self.inh = self.inh + inheritance
 
-    def set_id(self, p_id):
+    def set_id(self, p_id: int):
         """
         Award the person with an id number
 
@@ -37,7 +40,7 @@ class Person:
         """
         self.id = p_id
 
-    def to_array(self):
+    def to_array(self) -> List:
         """
         Create an array with all relevant statistics of the person
 
@@ -45,11 +48,11 @@ class Person:
                  inheritance
         :rtype: list
         """
-        return [self.id, int(self.g), self.pci, self.inh]
+        return [self.id, int(self.gender), self.pci, self.inh]
 
     @classmethod
-    def data_size(cls):
-        example = cls(0, 0)
+    def data_size(cls) -> int:
+        example = cls(False, 0)
         return len(example.to_array())
 
     def __str__(self):

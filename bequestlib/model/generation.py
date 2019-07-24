@@ -4,6 +4,7 @@ from bequestlib.globals import P, G
 from bequestlib.model.person import Person
 from numpy.random import RandomState
 import numpy as np
+from typing import Tuple, List, Dict, Callable
 
 
 class Generation:
@@ -13,7 +14,7 @@ class Generation:
     marital rules, and bequeathing their wealth to their offspring following
     bequest rules.
     """
-    def __init__(self, g_id, couples):
+    def __init__(self, g_id: int, couples: List[Couple]):
         """
         Constructor of a new generation with identity number *g_id*, from a
         list of all couples *couples*.
@@ -23,7 +24,7 @@ class Generation:
         :param couples: list of all constituent couples
         :type couples: ``list`` of ``Couple``
         """
-        self.cs = couples
+        self.cs: List[Couple] = couples
         self.n = len(couples)
         self.id = g_id
         self.preg = self.population_register()
@@ -43,21 +44,18 @@ class Generation:
             self.creg = self.couple_register()
         return self.creg[item]
 
-    def adult_population(self):
+    def adult_population(self) -> Tuple[List[Person], List[Person]]:
         """
         return lists of all men and women within the population
 
         :return: tuple of lists of all men and of all women
         :rtype: ``tuple`` of ``list`` of ``Person``
         """
-        men = []
-        women = []
-        for couple in self.cs:
-            men.append(couple.hb)
-            women.append(couple.wf)
+        men = [couple.hb for couple in self.cs]
+        women = [couple.wf for couple in self.cs]
         return men, women
 
-    def population_register(self):
+    def population_register(self) -> Dict[int, Person]:
         """
         produces a population register, a dictionary that links a person to
         its id number as key.
@@ -77,7 +75,7 @@ class Generation:
                                        same id""")
         return reg
 
-    def couple_register(self):
+    def couple_register(self) -> Dict[int, Couple]:
         """
         Creates a couple register: a dictionary of all couple ids to
         their respective couples.
@@ -90,7 +88,7 @@ class Generation:
             couple_reg[couple.id] = couple
         return couple_reg
 
-    def to_array(self):
+    def to_array(self) -> np.ndarray:
         """
         Turn the couple population into a single numpy array of
         important stats. Contains (in this order)
@@ -110,7 +108,7 @@ class Generation:
             i = i + 1
         return array
 
-    def distribute_children(self):
+    def distribute_children(self) -> None:
         """
         distribute children randomly among all families in the generation, in a
         fashion so that they respect the constraints:
@@ -141,7 +139,8 @@ class Generation:
             girls = len(children) - boys
             self.cs[i].get_children(boys, girls)
 
-    def produce_next_gen_bachelors(self, bequest_rule):
+    def produce_next_gen_bachelors(self, bequest_rule: Callable) \
+            -> Tuple[Dict[int, Person], Dict[int, Person]]:
         """
         Turn the children of all families in this generation, into a list of
         new adult persons who have inherited wealth, received a new id number.
@@ -166,7 +165,8 @@ class Generation:
                     bachelorettes[new_adult.id] = new_adult
         return bachelors, bachelorettes
 
-    def redistribute_taxes(self, bachelors, bachelorettes, tax_rate):
+    def redistribute_taxes(self, bachelors: Dict[int, Person],
+                           bachelorettes: Dict[int, Person], tax_rate: float) -> None:
         s = tax_rate
         total_tax = 0
         for id, person in bachelors.items():
@@ -184,7 +184,9 @@ class Generation:
             person.inh += lump_sum
         return bachelors, bachelorettes, lump_sum
 
-    def match_bachelors(self, bachelors, bachelorettes, marital_tradition):
+    def match_bachelors(self, bachelors: Dict[id, Person],
+                        bachelorettes: Dict[id, Person],
+                        marital_tradition: Callable) -> 'Generation':
         """
         Match the single men in *bachelors* and the single women in
         *bachelorettes*. The matches respects a marital tradition
@@ -217,7 +219,8 @@ class Generation:
             new_couples.append(new_couple)
         return Generation(self.id + 1, new_couples)
 
-    def produce_new_generation(self, bequest_rule, marital_tradition, tax_rate):
+    def produce_new_generation(self, bequest_rule: Callable,
+                               marital_tradition: Callable, tax_rate: float) -> 'Generation':
         """
         Make a generation of couples with children, create a new generation of
         adult couples. The current generation bequeaths wealth by a rule
