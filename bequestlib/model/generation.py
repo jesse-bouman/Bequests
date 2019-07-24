@@ -263,6 +263,29 @@ class Generation:
             decile = sum(decile_edges < couple.w) + 1
             couple.set_decile(decile)
 
+    def total_labour(self) -> float:
+        """
+        Calculates the total amount of time spent on labour by the entire generation
+
+        :return:
+        """
+        return sum([c.e for c in self.cs])
+
+    def total_consumption(self) -> float:
+        """
+        Calculates the total amount of consumption enjoyed by the entire generation
+
+        :return:
+        """
+        return sum([c.c for c in self.cs])
+
+    def number_of_idle_people(self) -> float:
+        """
+        Calculates the total amount of consumption enjoyed by the entire generation
+
+        :return:
+        """
+        return len([c for c in self.cs if c.e < 1e-6])
 
 def _dict_to_statslist(bach_dict):
     """

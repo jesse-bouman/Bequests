@@ -4,6 +4,30 @@ from bequestlib.model.couple import Couple
 from bequestlib.model.generation import Generation
 import numpy as np
 from scipy.stats import ks_2samp
+from typing import Callable
+
+
+def run_simulation(bequest_rule: Callable, marital_rule: Callable, tax_rate):
+        result = SimulationResult()
+        generator = next_gen_generator(bequest_rule, marital_rule, tax_rate)
+        for generation, d, p in generator:
+            result.add_generation(generation)
+        return result
+
+
+class SimulationResult:
+    def __init__(self):
+        self.generations = list()
+
+    def add_generation(self, gen: Generation):
+        self.generations.append(gen)
+
+    @property
+    def result_gen(self) -> Generation:
+        if self.generations:
+            return self.generations[-1]
+        else:
+            raise ValueError('No generations simulated yet')
 
 
 def create_init_couple(inheritance, index):
@@ -25,6 +49,8 @@ def init_generation():
     couples_list = [create_init_couple(0.01, i) for i in range(couples)]
     gen_1 = Generation(g_id=1, couples=couples_list)
     gen_1.distribute_children()
+    for cp in gen_1.cs:
+        cp.optimize_utility(0, 0.0)
     return gen_1
 
 
