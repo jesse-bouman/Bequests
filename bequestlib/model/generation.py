@@ -160,7 +160,7 @@ class Generation:
             for new_adult in new_adults:
                 new_adult.set_id(p_id)
                 p_id += 1
-                if new_adult.g:
+                if new_adult.gender:
                     bachelors[new_adult.id] = new_adult
                 else:
                     bachelorettes[new_adult.id] = new_adult
