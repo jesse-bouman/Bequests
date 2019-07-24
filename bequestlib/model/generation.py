@@ -29,6 +29,7 @@ class Generation:
         self.id = g_id
         self.preg = self.population_register()
         self.creg = None
+        self.lump_sum = None
 
     def __getitem__(self, item):
         """
@@ -182,7 +183,7 @@ class Generation:
             person.inh += lump_sum
         for id, person in bachelorettes.items():
             person.inh += lump_sum
-        return bachelors, bachelorettes, lump_sum
+        self.lump_sum = lump_sum
 
     def match_bachelors(self, bachelors: Dict[id, Person],
                         bachelorettes: Dict[id, Person],
@@ -234,11 +235,12 @@ class Generation:
         :rtype: Generation
         """
         bach_m, bach_f = self.produce_next_gen_bachelors(bequest_rule)
-        bach_m, bach_f, lump_sum = self.redistribute_taxes(bach_m, bach_f, tax_rate)
+        self.redistribute_taxes(bach_m, bach_f, tax_rate)
+        print(self.lump_sum)
         new_gen = self.match_bachelors(bach_m, bach_f, marital_tradition)
         new_gen.distribute_children()
         for cp in new_gen.cs:
-            cp.optimize_utility(lump_sum, tax_rate)
+            cp.optimize_utility(mu_exp=self.lump_sum, tax_rate=tax_rate)
         return new_gen
 
     def assign_deciles(self, measure='w'):
