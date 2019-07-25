@@ -1,6 +1,10 @@
+from bequestlib.random import get_random_state
+from bequestlib.model.couple import Couple
+from bequestlib.globals import P, G
+from bequestlib.model.person import Person
+from numpy.random import RandomState
 import numpy as np
-from bequestlib.couple import Couple
-from bequestlib.globals import P
+from typing import Tuple, List, Dict, Callable
 
 
 class Generation:
@@ -10,7 +14,7 @@ class Generation:
     marital rules, and bequeathing their wealth to their offspring following
     bequest rules.
     """
-    def __init__(self, g_id, couples):
+    def __init__(self, g_id: int, couples: List[Couple]):
         """
         Constructor of a new generation with identity number *g_id*, from a
         list of all couples *couples*.
@@ -20,13 +24,12 @@ class Generation:
         :param couples: list of all constituent couples
         :type couples: ``list`` of ``Couple``
         """
-        self.cs = couples
+        self.cs: List[Couple] = couples
         self.n = len(couples)
         self.id = g_id
         self.preg = self.population_register()
         self.creg = None
-        self.gini = None
-        self.x = self.y = None
+        self.lump_sum = None
 
     def __getitem__(self, item):
         """
@@ -42,21 +45,18 @@ class Generation:
             self.creg = self.couple_register()
         return self.creg[item]
 
-    def adult_population(self):
+    def adult_population(self) -> Tuple[List[Person], List[Person]]:
         """
         return lists of all men and women within the population
 
         :return: tuple of lists of all men and of all women
         :rtype: ``tuple`` of ``list`` of ``Person``
         """
-        men = []
-        women = []
-        for couple in self.cs:
-            men.append(couple.hb)
-            women.append(couple.wf)
+        men = [couple.hb for couple in self.cs]
+        women = [couple.wf for couple in self.cs]
         return men, women
 
-    def population_register(self):
+    def population_register(self) -> Dict[int, Person]:
         """
         produces a population register, a dictionary that links a person to
         its id number as key.
@@ -72,11 +72,11 @@ class Generation:
                     raise Exception("""Cannot make population register with
                                        unregistered persons""")
                 else:
-                    raise Exception("""multiple persons in generation with 
+                    raise Exception("""multiple persons in generation with
                                        same id""")
         return reg
 
-    def couple_register(self):
+    def couple_register(self) -> Dict[int, Couple]:
         """
         Creates a couple register: a dictionary of all couple ids to
         their respective couples.
@@ -89,7 +89,7 @@ class Generation:
             couple_reg[couple.id] = couple
         return couple_reg
 
-    def to_array(self):
+    def to_array(self) -> np.ndarray:
         """
         Turn the couple population into a single numpy array of
         important stats. Contains (in this order)
@@ -109,8 +109,7 @@ class Generation:
             i = i + 1
         return array
 
-
-    def distribute_children(self):
+    def distribute_children(self) -> None:
         """
         distribute children randomly among all families in the generation, in a
         fashion so that they respect the constraints:
@@ -122,25 +121,27 @@ class Generation:
         sets the respective number of children within each Couple object
         """
         all_new_children = [True] * self.n + [False] * self.n
-        np.random.shuffle(all_new_children)
+        random: RandomState = get_random_state()
+        random.shuffle(all_new_children)
         family_sizes = []
         i = 1
         j = 0
         for p in P:
             n_families_size_i = int(p * self.n)
             for fam in range(n_families_size_i):
-                children = all_new_children[j: j +i]
+                children = all_new_children[j: j + i]
                 j = j + i
                 family_sizes.append(children)
             i = i + 1
-        np.random.shuffle(family_sizes)
+        random.shuffle(family_sizes)
         for i in range(self.n):
             children = family_sizes[i]
             boys = sum(children)
             girls = len(children) - boys
             self.cs[i].get_children(boys, girls)
 
-    def produce_next_gen_bachelors(self, bequest_rule):
+    def produce_next_gen_bachelors(self, bequest_rule: Callable) \
+            -> Tuple[Dict[int, Person], Dict[int, Person]]:
         """
         Turn the children of all families in this generation, into a list of
         new adult persons who have inherited wealth, received a new id number.
@@ -159,13 +160,34 @@ class Generation:
             for new_adult in new_adults:
                 new_adult.set_id(p_id)
                 p_id += 1
-                if new_adult.g:
+                if new_adult.gender:
                     bachelors[new_adult.id] = new_adult
                 else:
                     bachelorettes[new_adult.id] = new_adult
         return bachelors, bachelorettes
 
-    def match_bachelors(self, bachelors, bachelorettes, marital_tradition):
+    def redistribute_taxes(self, bachelors: Dict[int, Person],
+                           bachelorettes: Dict[int, Person], tax_rate: float) -> None:
+        s = tax_rate
+        total_tax = 0
+        for id, person in bachelors.items():
+            tax = s * person.inh
+            person.inh -= tax
+            total_tax += tax
+        for id, person in bachelorettes.items():
+            tax = s * person.inh
+            person.inh -= tax
+            total_tax += tax
+        lump_sum = total_tax / (len(bachelors) + len(bachelorettes))
+        for id, person in bachelors.items():
+            person.inh += lump_sum
+        for id, person in bachelorettes.items():
+            person.inh += lump_sum
+        self.lump_sum = lump_sum
+
+    def match_bachelors(self, bachelors: Dict[id, Person],
+                        bachelorettes: Dict[id, Person],
+                        marital_tradition: Callable) -> 'Generation':
         """
         Match the single men in *bachelors* and the single women in
         *bachelorettes*. The matches respects a marital tradition
@@ -198,7 +220,8 @@ class Generation:
             new_couples.append(new_couple)
         return Generation(self.id + 1, new_couples)
 
-    def produce_new_generation(self, bequest_rule, marital_tradition):
+    def produce_new_generation(self, bequest_rule: Callable,
+                               marital_tradition: Callable, tax_rate: float) -> 'Generation':
         """
         Make a generation of couples with children, create a new generation of
         adult couples. The current generation bequeaths wealth by a rule
@@ -212,7 +235,12 @@ class Generation:
         :rtype: Generation
         """
         bach_m, bach_f = self.produce_next_gen_bachelors(bequest_rule)
+        self.redistribute_taxes(bach_m, bach_f, tax_rate)
+        print(self.lump_sum)
         new_gen = self.match_bachelors(bach_m, bach_f, marital_tradition)
+        new_gen.distribute_children()
+        for cp in new_gen.cs:
+            cp.optimize_utility(mu_exp=self.lump_sum, tax_rate=tax_rate)
         return new_gen
 
     def assign_deciles(self, measure='w'):
@@ -235,6 +263,30 @@ class Generation:
             decile = sum(decile_edges < couple.w) + 1
             couple.set_decile(decile)
 
+    def total_labour(self) -> float:
+        """
+        Calculates the total amount of time spent on labour by the entire generation
+
+        :return:
+        """
+        return sum([c.e for c in self.cs])
+
+    def total_consumption(self) -> float:
+        """
+        Calculates the total amount of consumption enjoyed by the entire generation
+
+        :return:
+        """
+        return sum([c.c for c in self.cs])
+
+    def number_of_idle_people(self) -> float:
+        """
+        Calculates the total amount of consumption enjoyed by the entire generation
+
+        :return:
+        """
+        return len([c for c in self.cs if c.e < 1e-6])
+
 def _dict_to_statslist(bach_dict):
     """
     Turn the dictionary of bachelor(ette)s into a list of important
@@ -245,7 +297,7 @@ def _dict_to_statslist(bach_dict):
     :return: list of all bachelor stats
     :rtype: numpy.array
     """
-    m = len(bach_dict.itervalues().next().to_array())
+    m = Person.data_size()
     bachelor_stats = np.zeros((len(bach_dict), m))
     i = 0
     for person in bach_dict.values():

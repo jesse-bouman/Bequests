@@ -1,6 +1,8 @@
-from globals import NU, GAMMA, E_S, G
+from bequestlib.globals import NU, GAMMA, E_S, G
 import numpy as np
-from bequestlib.person import Person
+from bequestlib.model.person import Person
+from typing import List, Callable
+from bequestlib.random import get_random_state
 
 
 class Couple:
@@ -8,7 +10,7 @@ class Couple:
     Class defining a couple of man and woman with the ability to get children,
     optimize utility, work, consume and make bequests.
     """
-    def __init__(self, husband, wife, c_id):
+    def __init__(self, husband: Person, wife: Person, c_id: int):
         """
         Class constructor, creating a couple with id *c_id* from a male and
         female person, *husband* and *wife* respectively. Initially the
@@ -22,22 +24,21 @@ class Couple:
         :param c_id: couple identifier
         :type c_id: ``int``
         """
-        self.hb = husband
-        self.wf = wife
-        self.inh_wealth = self.hb.inh + self.wf.inh
+        self.hb: Person = husband
+        self.wf: Person = wife
+        self.inh_wealth: float = self.hb.inh + self.wf.inh
         self.children = []
-        self.e = None
-        self.w = None
-        self.c = None
-        self.b = None
-        self.optimize_utility()
-        self.id = c_id
+        self.e: float = None
+        self.w: float = None
+        self.c: float = None
+        self.b: float = None
+        self.id: int = c_id
         self.decile = None
 
     def set_decile(self, decile):
         self.decile = decile
 
-    def get_children(self, boys, girls):
+    def get_children(self, boys: int, girls: int):
         """
         Assign children to the family. Given a determined number of n *boys*
         and *m* girls, this method constructs a list of n+m booleans,
@@ -52,11 +53,12 @@ class Couple:
         :param girls: Number of daughters in family
         :type girls: ``int``
         """
-        child_vector = [True]*boys + [False]*girls
-        np.random.shuffle(child_vector)
+        child_vector = [True] * boys + [False] * girls
+        random = get_random_state()
+        random.shuffle(child_vector)
         self.children = child_vector
 
-    def optimize_utility(self):
+    def optimize_utility(self, mu_exp: float, tax_rate: float):
         """
         Let the couple, based on their total inherited wealth, make a utility
         optimizing decision on the amount of work, consumption and bequest they
@@ -72,16 +74,27 @@ class Couple:
 
         """
         i = self.inh_wealth
-        e = np.maximum((E_S - NU * i) / (1. + NU), 0)
+        k = len(self.children)
+        perceived_w = (mu_exp * k) / ((1 + G) * (1 - tax_rate))
+        e = np.maximum((E_S - NU * (i + perceived_w)) / (1. + NU), 0)
         w = e + i
-        c = (1 - GAMMA) * w
-        b = (1 + G) * GAMMA * w
+        c = (1 - GAMMA) * (e + i + perceived_w)
+        b = (1 + G) * GAMMA * (e + i + perceived_w) - (1 - GAMMA) / (1 - tax_rate) * mu_exp * k
+        if b < 0:
+            b = 0
+            e = (1 - GAMMA - NU * i) / (1 - GAMMA + NU)
+            c = (1 - GAMMA) / NU * (E_S - e)
+        assert not b < 0
+        assert not e < 0
+        assert not e > 1
+        assert not c < 0
+
         self.e = e
         self.w = w
         self.c = c
         self.b = b
 
-    def produce_new_adults(self, bequestrule):
+    def produce_new_adults(self, bequestrule: Callable) -> List[Person]:
         """
         Turns the children of this couple into a list of new adults.
         Distributes the funds available for bequests among these children
@@ -105,7 +118,7 @@ class Couple:
             new_adults.append(new_adult)
         return new_adults
 
-    def to_array(self):
+    def to_array(self) -> List:
         """
         Provide an array that represents the most important information
         of the couple object. Contains:
