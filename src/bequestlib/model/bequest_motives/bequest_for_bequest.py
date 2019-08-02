@@ -1,6 +1,6 @@
 from bequestlib.model.bequest_motives.optimizer_abc import AbstractUtilityOptimizer
 import numpy as np
-from bequestlib.globals import GAMMA, NU, G
+from bequestlib.globals import settings
 
 
 class UtilityOptimizer(AbstractUtilityOptimizer):
@@ -8,8 +8,8 @@ class UtilityOptimizer(AbstractUtilityOptimizer):
                          n_children: int,
                          mu_exp: float,
                          tax_rate: float):
-        e = np.maximum((1 - NU * inh_wealth) / (1 + NU), 0)
+        e = np.maximum((1 - settings.NU * inh_wealth) / (1 + settings.NU), 0)
         w = inh_wealth + e
-        c = (1 - GAMMA) * w
-        b = (1 + G) * GAMMA * w
+        c = (1 - settings.GAMMA) * w
+        b = (1 + settings.G) * settings.GAMMA * w
         return w, e, c, b

@@ -1,4 +1,4 @@
-from bequestlib.globals import N_POPULATION
+from bequestlib.globals import settings
 from bequestlib.model.person import Person
 from bequestlib.model.couple import Couple
 from bequestlib.model.generation import Generation
@@ -31,20 +31,20 @@ class SimulationResult:
 
 
 def create_init_couple(inheritance, index):
-    couples = int(N_POPULATION / 2.)
+    couples = int(settings.N_POPULATION / 2.)
     hb = Person(gender=True, parent_couple_id=index)
     wf = Person(gender=False, parent_couple_id=couples - index)
     hb.set_id(index)
     wf.set_id(couples + index)
-    hb.add_inheritance(inheritance)
-    wf.add_inheritance(0.)
+    wf.add_inheritance(inheritance)
+    hb.add_inheritance(0.)
     cp = Couple(husband=hb, wife=wf, c_id=index)
     return cp
 
 
 def init_generation():
     # set up a fully egalitarian starting generation
-    n = N_POPULATION
+    n = settings.N_POPULATION
     couples = int(n / 2.)
     couples_list = [create_init_couple(0.01, i) for i in range(couples)]
     gen_1 = Generation(g_id=1, couples=couples_list)

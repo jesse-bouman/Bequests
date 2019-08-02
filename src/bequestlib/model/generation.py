@@ -2,7 +2,7 @@ from typing import Tuple, List, Dict, Callable
 
 import numpy as np
 
-from bequestlib.globals import P
+from bequestlib.globals import settings
 from bequestlib.model.couple import Couple
 from bequestlib.model.person import Person
 from bequestlib.random import get_random_state, RandomState
@@ -128,7 +128,7 @@ class Generation:
         family_sizes = []
         i = 1
         j = 0
-        for p in P:
+        for p in settings.P:
             n_families_size_i = int(p * self.n)
             for fam in range(n_families_size_i):
                 children = all_new_children[j: j + i]

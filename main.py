@@ -1,17 +1,11 @@
-import os
-
 import matplotlib.pyplot as plt
+import numpy as np
 
-from bequestlib.globals import OUTFOLDER
 from bequestlib.model.model_closure import run_simulation
 from bequestlib.model.society_rules import (all_children_equal, best_partner_is_richest_partner)
-import numpy as np
 
 
 def main():
-    if not os.path.exists(OUTFOLDER):
-        os.mkdir(OUTFOLDER)
-    os.chdir(OUTFOLDER)
     x = list()
     y = list()
     keeper = list()
