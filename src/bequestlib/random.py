@@ -1,7 +1,7 @@
 from numpy.random import RandomState
-
-SEED = 1
-
+from numpy.random import randint
+SEED = randint(1, 10000000)
+print(SEED)
 RANDOM_STATE = RandomState(SEED)
 
 

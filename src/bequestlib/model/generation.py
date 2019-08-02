@@ -1,10 +1,11 @@
-from bequestlib.random import get_random_state
-from bequestlib.model.couple import Couple
-from bequestlib.globals import P, G
-from bequestlib.model.person import Person
-from numpy.random import RandomState
-import numpy as np
 from typing import Tuple, List, Dict, Callable
+
+import numpy as np
+
+from bequestlib.globals import P
+from bequestlib.model.couple import Couple
+from bequestlib.model.person import Person
+from bequestlib.random import get_random_state, RandomState
 
 
 class Generation:
@@ -30,6 +31,7 @@ class Generation:
         self.preg = self.population_register()
         self.creg = None
         self.lump_sum = None
+        self.prev_lump_sum = 0
 
     def __getitem__(self, item):
         """
@@ -239,8 +241,9 @@ class Generation:
         print(self.lump_sum)
         new_gen = self.match_bachelors(bach_m, bach_f, marital_tradition)
         new_gen.distribute_children()
+        new_gen.prev_lump_sum = self.lump_sum
         for cp in new_gen.cs:
-            cp.optimize_utility(mu_exp=self.lump_sum, tax_rate=tax_rate)
+            cp.optimize_utility(mu_exp=(self.lump_sum + self.prev_lump_sum)/2, tax_rate=tax_rate)
         return new_gen
 
     def assign_deciles(self, measure='w'):

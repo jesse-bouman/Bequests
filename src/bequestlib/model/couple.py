@@ -1,7 +1,7 @@
-from bequestlib.globals import NU, GAMMA, E_S, G
-import numpy as np
-from bequestlib.model.person import Person
 from typing import List, Callable
+
+from bequestlib.model.bequest_motives.motive_manager import get_utility_optimizer
+from bequestlib.model.person import Person
 from bequestlib.random import get_random_state
 
 
@@ -73,17 +73,11 @@ class Couple:
         | ``b``: total funds available for bequests
 
         """
-        i = self.inh_wealth
-        k = len(self.children)
-        perceived_w = (mu_exp * k) / ((1 + G) * (1 - tax_rate))
-        e = np.maximum((E_S - NU * (i + perceived_w)) / (1. + NU), 0)
-        w = e + i
-        c = (1 - GAMMA) * (e + i + perceived_w)
-        b = (1 + G) * GAMMA * (e + i + perceived_w) - (1 - GAMMA) / (1 - tax_rate) * mu_exp * k
-        if b < 0:
-            b = 0
-            e = (1 - GAMMA - NU * i) / (1 - GAMMA + NU)
-            c = (1 - GAMMA) / NU * (E_S - e)
+        optimizer = get_utility_optimizer()
+        w, e, c, b = optimizer.optimize_utility(inh_wealth=self.inh_wealth,
+                                                tax_rate=tax_rate,
+                                                mu_exp=mu_exp,
+                                                n_children=len(self.children))
         assert not b < 0
         assert not e < 0
         assert not e > 1

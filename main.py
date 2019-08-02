@@ -3,20 +3,27 @@ import os
 import matplotlib.pyplot as plt
 
 from bequestlib.globals import OUTFOLDER
-from bequestlib.metrics.metrics import lorentz_curve
 from bequestlib.model.model_closure import run_simulation
 from bequestlib.model.society_rules import (all_children_equal, best_partner_is_richest_partner)
+import numpy as np
 
 
 def main():
     if not os.path.exists(OUTFOLDER):
         os.mkdir(OUTFOLDER)
     os.chdir(OUTFOLDER)
-    for tax_rate in [0.2, 0.4, 0.6, 0.8]:
+    x = list()
+    y = list()
+    keeper = list()
+    for tax_rate in list(np.arange(0, 0.85, 0.05)) + list(np.arange(0.85, 0.99, 0.01)):
+        print(tax_rate)
         result = run_simulation(all_children_equal, best_partner_is_richest_partner, tax_rate)
         gen = result.result_gen
-        print(gen.total_labour())
-        plt.plot(*lorentz_curve(gen), label=f'{tax_rate*100} %')
+        gen.produce_new_generation(all_children_equal, best_partner_is_richest_partner, tax_rate)
+        x.append(tax_rate)
+        y.append(gen.lump_sum)
+        keeper.append(result.generations[-3:-1])
+    plt.plot(x, y)
     plt.legend()
     plt.show()
 

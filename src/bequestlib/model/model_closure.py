@@ -50,7 +50,7 @@ def init_generation():
     gen_1 = Generation(g_id=1, couples=couples_list)
     gen_1.distribute_children()
     for cp in gen_1.cs:
-        cp.optimize_utility(0, 0.0)
+        cp.optimize_utility(0.069, 0.9)
     return gen_1
 
 
@@ -60,7 +60,7 @@ def next_gen_generator(bequest_rule, marital_tradition, tax_rate):
     a = wealths / sum(wealths)
     test_period = 0
     tot_period = 0
-    while test_period < 30 and tot_period < 10:
+    while test_period < 10 and tot_period < 100:
         next_gen = adult_gen.produce_new_generation(bequest_rule=bequest_rule,
                                                     marital_tradition=marital_tradition,
                                                     tax_rate=tax_rate)
@@ -69,6 +69,8 @@ def next_gen_generator(bequest_rule, marital_tradition, tax_rate):
         wealth = np.sort(adult_gen.to_array()[:, 1])
         prev_a = a
         a = wealth / sum(wealth)
+        print(a)
+        print(prev_a)
         d, p = ks_2samp(prev_a, a)
         if p > 0.5:
             test_period = test_period + 1

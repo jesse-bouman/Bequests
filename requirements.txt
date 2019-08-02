@@ -3,3 +3,4 @@ matplotlib
 sphinx>=1.4.3
 configparser
 tox
+python-decouple
