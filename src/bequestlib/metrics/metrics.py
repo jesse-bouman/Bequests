@@ -1,7 +1,8 @@
 import numpy as np
+from bequestlib.model.generation import Generation
 
 
-def lorentz_curve(gen):
+def lorentz_curve(gen: Generation):
     """
     Determine the lorentz curve for total wealth inequality of generation *gen*
 
@@ -24,7 +25,11 @@ def lorentz_curve(gen):
     return x, y
 
 
-def gini(x, y):
+def total_wealth(gen: Generation):
+    return sum([c.w for c in gen.cs])
+
+
+def gini(gen: Generation):
     """
     calculate the GINI coefficient from the population's lorentz curve
     determined by *x* and *y*.
@@ -36,6 +41,7 @@ def gini(x, y):
     :return: GINI coefficient determined by Lorentz curve
     :rtype: ``float``
     """
+    y = [c.w for c in gen.cs]
     mad = np.abs(np.subtract.outer(y, y)).mean()
     rmad = mad / np.mean(y)
     gini = 0.5 * rmad

@@ -6,7 +6,7 @@ from bequestlib.globals import settings
 from bequestlib.model.couple import Couple
 from bequestlib.model.person import Person
 from bequestlib.random import get_random_state, RandomState
-
+from scipy.stats import ks_2samp
 
 class Generation:
     """
@@ -25,6 +25,7 @@ class Generation:
         :param couples: list of all constituent couples
         :type couples: ``list`` of ``Couple``
         """
+        assert 2 * len(couples) == settings.N_POPULATION
         self.cs: List[Couple] = couples
         self.n = len(couples)
         self.id = g_id
@@ -238,7 +239,6 @@ class Generation:
         """
         bach_m, bach_f = self.produce_next_gen_bachelors(bequest_rule)
         self.redistribute_taxes(bach_m, bach_f, tax_rate)
-        print(self.lump_sum)
         new_gen = self.match_bachelors(bach_m, bach_f, marital_tradition)
         new_gen.distribute_children()
         new_gen.prev_lump_sum = self.lump_sum
@@ -289,6 +289,14 @@ class Generation:
         :return:
         """
         return len([c for c in self.cs if c.e < 1e-6])
+
+    def significance_of_difference_to_other_gen(self, gen: 'Generation') -> Tuple[float, float]:
+
+        wealth = np.sort(self.to_array()[:, 1])
+        a = wealth / sum(wealth)
+        wealth_comp = np.sort(gen.to_array()[:, 1])
+        b = wealth_comp / sum(wealth_comp)
+        return ks_2samp(a, b)
 
 def _dict_to_statslist(bach_dict):
     """
