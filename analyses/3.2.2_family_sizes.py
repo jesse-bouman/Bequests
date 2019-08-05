@@ -39,6 +39,11 @@ for name, setup in setups.items():
     stds.append(np.sqrt(2*b))
     ginis.append(gini(result_gen))
 
+# compare to regular vector
+settings.set_config('P', [0.35, 0.45, 0.1, 0.06, 0.03, 0.01])
+test_result: SimulationResult = run_simulation(all_children_equal, love_is_blind, 0.0)
+print(gini(test_result.result_gen))
+
 plt.show()
 plt.clf()
 output_gini = OutputData('gini_vs_stdv')
