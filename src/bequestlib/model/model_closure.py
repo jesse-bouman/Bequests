@@ -15,6 +15,7 @@ def run_simulation(bequest_rule: Callable, marital_rule: Callable, tax_rate):
         generator = next_gen_generator(bequest_rule, marital_rule, tax_rate)
         for generation, d, p, success in generator:
             result.add_generation(generation, d, p, success)
+            #print(generation.lump_sum)
         return result
 
 
@@ -34,7 +35,7 @@ class SimulationResult:
 
     def run_converged(self) -> bool:
         start_point = -1 * N_EQUAL_FOR_SUCCESS
-        return all([r['success'] for r in self._results[start_point:-1:-1]])
+        return all([r['success'] for r in self._results[start_point:-1]])
 
     @property
     def result_gen(self) -> Generation:
@@ -68,6 +69,7 @@ def init_generation():
     gen_1.distribute_children()
     for cp in gen_1.cs:
         cp.optimize_utility(0, 0)
+    gen_1.lump_sum = 0
     return gen_1
 
 

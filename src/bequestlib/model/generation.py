@@ -32,7 +32,7 @@ class Generation:
         self.preg = self.population_register()
         self.creg = None
         self.lump_sum = None
-        self.prev_lump_sum = 0
+        self.prev_lump_sums = list()
 
     def __getitem__(self, item):
         """
@@ -186,7 +186,7 @@ class Generation:
             person.inh += lump_sum
         for id, person in bachelorettes.items():
             person.inh += lump_sum
-        self.lump_sum = lump_sum
+        return 2 * lump_sum
 
     def match_bachelors(self, bachelors: Dict[id, Person],
                         bachelorettes: Dict[id, Person],
@@ -238,12 +238,17 @@ class Generation:
         :rtype: Generation
         """
         bach_m, bach_f = self.produce_next_gen_bachelors(bequest_rule)
-        self.redistribute_taxes(bach_m, bach_f, tax_rate)
+        lump_sum = self.redistribute_taxes(bach_m, bach_f, tax_rate)
         new_gen = self.match_bachelors(bach_m, bach_f, marital_tradition)
         new_gen.distribute_children()
-        new_gen.prev_lump_sum = self.lump_sum
+        new_gen.lump_sum = lump_sum
+        new_gen.prev_lump_sums = self.prev_lump_sums
+        new_gen.prev_lump_sums.append(lump_sum)
+        exp_lump_sum = sum(new_gen.prev_lump_sums)/ len(new_gen.prev_lump_sums)
+        print(exp_lump_sum - lump_sum)
+        new_gen.exp_lump_sum = exp_lump_sum
         for cp in new_gen.cs:
-            cp.optimize_utility(mu_exp=(self.lump_sum + self.prev_lump_sum)/2, tax_rate=tax_rate)
+            cp.optimize_utility(mu_exp=exp_lump_sum, tax_rate=tax_rate)
         return new_gen
 
     def assign_deciles(self, measure='w'):
@@ -293,10 +298,11 @@ class Generation:
     def significance_of_difference_to_other_gen(self, gen: 'Generation') -> Tuple[float, float]:
 
         wealth = np.sort(self.to_array()[:, 1])
-        a = wealth / sum(wealth)
+        # a = wealth / sum(wealth)
         wealth_comp = np.sort(gen.to_array()[:, 1])
-        b = wealth_comp / sum(wealth_comp)
-        return ks_2samp(a, b)
+        #b = wealth_comp / sum(wealth_comp)
+        # print(sum(wealth) - sum(wealth_comp))
+        return ks_2samp(wealth, wealth_comp)
 
 def _dict_to_statslist(bach_dict):
     """
